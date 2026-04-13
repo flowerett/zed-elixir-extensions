@@ -35,6 +35,19 @@ languages = [
 "EEx" = "eex"
 "HEEx" = "heex"
 
+[language_servers.dexter]
+name = "Dexter"
+languages = [
+    "Elixir",
+    "EEx",
+    "HEEx",
+]
+
+[language_servers.dexter.language_ids]
+"Elixir" = "elixir"
+"EEx" = "eex"
+"HEEx" = "heex"
+
 [language_servers.next-ls]
 name = "Next LS"
 languages = [

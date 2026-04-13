@@ -6,11 +6,12 @@ use zed_extension_api::{
     serde_json::Value,
 };
 
-use crate::language_servers::{ElixirLs, Expert, Lexical, NextLs};
+use crate::language_servers::{Dexter, ElixirLs, Expert, Lexical, NextLs};
 
 struct ElixirExtension {
     expert: Option<Expert>,
     elixir_ls: Option<ElixirLs>,
+    dexter: Option<Dexter>,
     next_ls: Option<NextLs>,
     lexical: Option<Lexical>,
 }
@@ -20,6 +21,7 @@ impl zed::Extension for ElixirExtension {
         Self {
             expert: None,
             elixir_ls: None,
+            dexter: None,
             next_ls: None,
             lexical: None,
         }
@@ -38,6 +40,10 @@ impl zed::Extension for ElixirExtension {
             ElixirLs::LANGUAGE_SERVER_ID => self
                 .elixir_ls
                 .get_or_insert_with(ElixirLs::new)
+                .language_server_command(language_server_id, worktree),
+            Dexter::LANGUAGE_SERVER_ID => self
+                .dexter
+                .get_or_insert_with(Dexter::new)
                 .language_server_command(language_server_id, worktree),
             NextLs::LANGUAGE_SERVER_ID => self
                 .next_ls
@@ -65,6 +71,10 @@ impl zed::Extension for ElixirExtension {
                 .elixir_ls
                 .get_or_insert_with(ElixirLs::new)
                 .language_server_initialization_options(worktree),
+            Dexter::LANGUAGE_SERVER_ID => self
+                .dexter
+                .get_or_insert_with(Dexter::new)
+                .language_server_initialization_options(worktree),
             NextLs::LANGUAGE_SERVER_ID => self
                 .next_ls
                 .get_or_insert_with(NextLs::new)
@@ -91,6 +101,10 @@ impl zed::Extension for ElixirExtension {
                 .elixir_ls
                 .get_or_insert_with(ElixirLs::new)
                 .language_server_workspace_configuration(worktree),
+            Dexter::LANGUAGE_SERVER_ID => self
+                .dexter
+                .get_or_insert_with(Dexter::new)
+                .language_server_workspace_configuration(worktree),
             NextLs::LANGUAGE_SERVER_ID => self
                 .next_ls
                 .get_or_insert_with(NextLs::new)
@@ -113,6 +127,7 @@ impl zed::Extension for ElixirExtension {
             ElixirLs::LANGUAGE_SERVER_ID => {
                 self.elixir_ls.as_ref()?.label_for_completion(completion)
             }
+            Dexter::LANGUAGE_SERVER_ID => self.dexter.as_ref()?.label_for_completion(completion),
             NextLs::LANGUAGE_SERVER_ID => self.next_ls.as_ref()?.label_for_completion(completion),
             Lexical::LANGUAGE_SERVER_ID => self.lexical.as_ref()?.label_for_completion(completion),
             _ => None,
@@ -127,6 +142,7 @@ impl zed::Extension for ElixirExtension {
         match language_server_id.as_ref() {
             Expert::LANGUAGE_SERVER_ID => self.expert.as_ref()?.label_for_symbol(symbol),
             ElixirLs::LANGUAGE_SERVER_ID => self.elixir_ls.as_ref()?.label_for_symbol(symbol),
+            Dexter::LANGUAGE_SERVER_ID => self.dexter.as_ref()?.label_for_symbol(symbol),
             NextLs::LANGUAGE_SERVER_ID => self.next_ls.as_ref()?.label_for_symbol(symbol),
             Lexical::LANGUAGE_SERVER_ID => self.lexical.as_ref()?.label_for_symbol(symbol),
             _ => None,
