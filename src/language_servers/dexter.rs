@@ -46,7 +46,6 @@ impl Dexter {
         worktree: &Worktree,
     ) -> Result<DexterBinary> {
         let (platform, arch) = zed::current_platform();
-
         let archive_name = format!(
             "{}_{os}_{arch}",
             Self::LANGUAGE_SERVER_ID,
@@ -126,8 +125,6 @@ impl Dexter {
             .ok_or_else(|| format!("no asset found matching {:?}", asset_name))?;
 
         let version_dir = format!("{}-{}", Self::LANGUAGE_SERVER_ID, release.version);
-        fs::create_dir_all(&version_dir).map_err(|e| format!("failed to create directory: {e}"))?;
-
         let binary_path = format!("{}/{}", version_dir, binary_name);
 
         if !fs::metadata(&binary_path).is_ok_and(|stat| stat.is_file()) {
