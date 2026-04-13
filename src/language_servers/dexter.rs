@@ -65,8 +65,8 @@ impl Dexter {
 
         let binary_name = format!("{}/{}", archive_name, Self::LANGUAGE_SERVER_ID);
         let binary_settings = config::get_binary_settings(Self::LANGUAGE_SERVER_ID, worktree);
-        let binary_args = config::get_binary_args(&binary_settings)
-            .unwrap_or_else(|| vec!["lsp".to_string()]);
+        let binary_args =
+            config::get_binary_args(&binary_settings).unwrap_or_else(|| vec!["lsp".to_string()]);
 
         if let Some(binary_path) = config::get_binary_path(&binary_settings) {
             return Ok(DexterBinary {
