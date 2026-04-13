@@ -6,9 +6,10 @@ use zed_extension_api::{
     serde_json::Value,
 };
 
-use crate::language_servers::{ElixirLs, Expert, Lexical, NextLs};
+use crate::language_servers::{Dexter, ElixirLs, Expert, Lexical, NextLs};
 
 struct ElixirExtension {
+    dexter: Option<Dexter>,
     expert: Option<Expert>,
     elixir_ls: Option<ElixirLs>,
     next_ls: Option<NextLs>,
@@ -18,6 +19,7 @@ struct ElixirExtension {
 impl zed::Extension for ElixirExtension {
     fn new() -> Self {
         Self {
+            dexter: None,
             expert: None,
             elixir_ls: None,
             next_ls: None,
@@ -31,6 +33,10 @@ impl zed::Extension for ElixirExtension {
         worktree: &Worktree,
     ) -> Result<zed::Command> {
         match language_server_id.as_ref() {
+            Dexter::LANGUAGE_SERVER_ID => self
+                .dexter
+                .get_or_insert_with(Dexter::new)
+                .language_server_command(language_server_id, worktree),
             Expert::LANGUAGE_SERVER_ID => self
                 .expert
                 .get_or_insert_with(Expert::new)
@@ -57,6 +63,10 @@ impl zed::Extension for ElixirExtension {
         worktree: &Worktree,
     ) -> Result<Option<Value>> {
         match language_server_id.as_ref() {
+            Dexter::LANGUAGE_SERVER_ID => self
+                .dexter
+                .get_or_insert_with(Dexter::new)
+                .language_server_initialization_options(worktree),
             Expert::LANGUAGE_SERVER_ID => self
                 .expert
                 .get_or_insert_with(Expert::new)
@@ -83,6 +93,10 @@ impl zed::Extension for ElixirExtension {
         worktree: &Worktree,
     ) -> Result<Option<Value>> {
         match language_server_id.as_ref() {
+            Dexter::LANGUAGE_SERVER_ID => self
+                .dexter
+                .get_or_insert_with(Dexter::new)
+                .language_server_workspace_configuration(worktree),
             Expert::LANGUAGE_SERVER_ID => self
                 .expert
                 .get_or_insert_with(Expert::new)
@@ -109,6 +123,7 @@ impl zed::Extension for ElixirExtension {
         completion: Completion,
     ) -> Option<CodeLabel> {
         match language_server_id.as_ref() {
+            Dexter::LANGUAGE_SERVER_ID => self.dexter.as_ref()?.label_for_completion(completion),
             Expert::LANGUAGE_SERVER_ID => self.expert.as_ref()?.label_for_completion(completion),
             ElixirLs::LANGUAGE_SERVER_ID => {
                 self.elixir_ls.as_ref()?.label_for_completion(completion)
@@ -125,6 +140,7 @@ impl zed::Extension for ElixirExtension {
         symbol: Symbol,
     ) -> Option<CodeLabel> {
         match language_server_id.as_ref() {
+            Dexter::LANGUAGE_SERVER_ID => self.dexter.as_ref()?.label_for_symbol(symbol),
             Expert::LANGUAGE_SERVER_ID => self.expert.as_ref()?.label_for_symbol(symbol),
             ElixirLs::LANGUAGE_SERVER_ID => self.elixir_ls.as_ref()?.label_for_symbol(symbol),
             NextLs::LANGUAGE_SERVER_ID => self.next_ls.as_ref()?.label_for_symbol(symbol),

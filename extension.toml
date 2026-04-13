@@ -9,6 +9,17 @@ authors = [
 ]
 repository = "https://github.com/zed-extensions/elixir"
 
+[language_servers.dexter]
+name = "Dexter"
+languages = [
+    "Elixir",
+    "HEEx",
+]
+
+[language_servers.dexter.language_ids]
+"Elixir" = "elixir"
+"HEEx" = "heex"
+
 [language_servers.expert]
 name = "Expert"
 languages = [
