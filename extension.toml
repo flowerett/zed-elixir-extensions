@@ -13,11 +13,13 @@ repository = "https://github.com/zed-extensions/elixir"
 name = "Dexter"
 languages = [
     "Elixir",
+    "EEx",
     "HEEx",
 ]
 
 [language_servers.dexter.language_ids]
 "Elixir" = "elixir"
+"EEx" = "eex"
 "HEEx" = "heex"
 
 [language_servers.expert]
