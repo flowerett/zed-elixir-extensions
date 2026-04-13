@@ -47,16 +47,13 @@ impl Dexter {
     ) -> Result<DexterBinary> {
         let (platform, arch) = zed::current_platform();
 
-        if matches!(platform, zed::Os::Windows) {
-            return Err("Dexter does not support Windows".to_string());
-        }
-
-        let platform_suffix = format!(
-            "{os}_{arch}",
+        let archive_name = format!(
+            "{}_{os}_{arch}",
+            Self::LANGUAGE_SERVER_ID,
             os = match platform {
                 zed::Os::Mac => "Darwin",
                 zed::Os::Linux => "Linux",
-                zed::Os::Windows => unreachable!(),
+                zed::Os::Windows => return Err(format!("unsupported platform: {platform:?}")),
             },
             arch = match arch {
                 zed::Architecture::Aarch64 => "arm64",
@@ -66,6 +63,7 @@ impl Dexter {
             },
         );
 
+        let binary_name = format!("{}/{}", archive_name, Self::LANGUAGE_SERVER_ID);
         let binary_settings = config::get_binary_settings(Self::LANGUAGE_SERVER_ID, worktree);
         let binary_args = config::get_binary_args(&binary_settings)
             .unwrap_or_else(|| vec!["lsp".to_string()]);
@@ -107,7 +105,6 @@ impl Dexter {
         ) {
             Ok(release) => release,
             Err(_) => {
-                let binary_name = format!("dexter_{platform_suffix}/dexter");
                 if let Some(binary_path) =
                     util::find_existing_binary(Self::LANGUAGE_SERVER_ID, &binary_name)
                 {
@@ -121,8 +118,7 @@ impl Dexter {
             }
         };
 
-        let asset_name = format!("dexter_{platform_suffix}.tar.gz");
-
+        let asset_name = format!("{archive_name}.tar.gz");
         let asset = release
             .assets
             .iter()
@@ -132,7 +128,7 @@ impl Dexter {
         let version_dir = format!("{}-{}", Self::LANGUAGE_SERVER_ID, release.version);
         fs::create_dir_all(&version_dir).map_err(|e| format!("failed to create directory: {e}"))?;
 
-        let binary_path = format!("{version_dir}/dexter_{platform_suffix}/dexter");
+        let binary_path = format!("{}/{}", version_dir, binary_name);
 
         if !fs::metadata(&binary_path).is_ok_and(|stat| stat.is_file()) {
             zed::set_language_server_installation_status(
